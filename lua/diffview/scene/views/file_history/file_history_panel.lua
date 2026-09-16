@@ -706,13 +706,14 @@ function FileHistoryPanel:highlight_item(item)
       if i ~= -1 then
         if self.single_file then
           target_row = comp_struct.comp.lstart + 1
+        elseif entry.folded then
+          -- A collapsed entry must not be expanded just to land the cursor on
+          -- its file row: expanding/collapsing is an explicit user action
+          -- (l / h). Park the cursor on the entry row instead. Mirrors the
+          -- diff panel's `highlight_file`, which also avoids expanding
+          -- collapsed directories.
+          target_row = comp_struct.comp.lstart + 1
         else
-          if entry.folded then
-            entry.folded = false
-            self:render()
-            self:redraw()
-          end
-
           target_row = comp_struct.comp.lstart + i + 1
         end
       elseif entry._pin_overlays and entry._pin_overlays[item.path] == item then
